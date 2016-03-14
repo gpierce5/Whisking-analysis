@@ -1,0 +1,18 @@
+
+STEPS FOR WHISKER VIDEO ANALYSIS:
+
+1) Invert video colors in ffmpeg and save as .mp4
+
+2) Run "trace" from command prompt to generate .whiskers file (TAKES A LONG TIME)
+
+3) Run "measure" from command prompt to generate .measurements file
+
+4) In matlab, run "traceAnalysis_c" (or whatever is latest version) on .measurements file. Make sure setttings in 'checkTrace' are optimized for current video. (TAKES A LONG TIME)
+
+5) Run 'whiskerangle_bin' to calculate mean, median, variance of traced objects across frames.
+
+6) If want to create a video, run 'whiskerMovie.m' in matlab (TAKES A LONG TIME).
+
+7) To align ntrode and videos, run 'alignNtrodeandVideo'. Set the threshold for the LED syncing signal, and determine the start trials in ntrode and the video.
+
+8) Run whatever analysis you want (e.g. behav_SpikeTimesvsWhiskingbyTrialb).
