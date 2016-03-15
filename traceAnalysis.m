@@ -1,6 +1,4 @@
-function traceAnalysis_c(filename,plotFig) %Use filename + .mat extension
-
-close all
+function traceAnalysis(filename,plotFig) %Use filename + .mat extension
 
 %Loading all the necessary files
 vidfile = sprintf('%s',filename(1:end-4),'.mp4');
@@ -11,6 +9,8 @@ measurefile = sprintf('%s',filename(1:end-4),'.measurements');
 disp('Loading measurements file...')
 measurements = LoadMeasurements(measurefile);
 
+%defines the area in the video where the whiskers are and the line of the
+%mouse's cheek
 if exist(filename,'file') ~= 2 %Create a mat file if doesn't already exist and run the 'setup' analysis
     analyzeWhiskersSetup(filename,vidobj);
 end
@@ -22,7 +22,7 @@ for i = 1:size(measurements,1)
     frame(i) = measurements(i).fid;
 end
 
-minLength = 80;
+minLength = 70;
 %whiskerFrames(1) = struct('cdata',zeros(vidHeight,vidWidth,'uint8'),...
 %    'colormap',[]);
 
@@ -35,7 +35,7 @@ z = 1;
 %plotFig = 'y';
 
 if isequal(plotFig,'y')
-    h = figure(1);
+    h = figure();
     set(0,'CurrentFigure',h)
 end
 
@@ -56,8 +56,8 @@ for i = 1:nFrames
     IRledSignal(:,i) = reshape(temp,3,1);
     
     if isequal(plotFig,'y')
-        %Plot the current frame
-        figure(1)
+        %Plot the current frame including our whisker area and LED location
+        figure(h)
         image(whiskMov.cdata)
         hold on
         title(sprintf('%s','Frame ',num2str(i-1)))
@@ -74,6 +74,9 @@ for i = 1:nFrames
     
     %Going through each object in this frame for analysis
     for j = 1:length(indList)
+        
+        %waitforbuttonpress
+        
         t = indList(j);
         
         %Find the 'follicle' point, which is the closest point on the
@@ -82,14 +85,25 @@ for i = 1:nFrames
         follicleY = measurements(t).follicle_y;
         whiskerTipX = measurements(t).tip_x;
         whiskerTipY = measurements(t).tip_y;
-        minFollicleDistance = findFollicle_b(follicleX,follicleY,faceEdgeX,faceEdgeY);
+        minFollicleDistance = findFollicle(follicleX,follicleY,faceEdgeX,faceEdgeY);
         whiskerCurve = measurements(t).curvature;
-        whiskAngle =  faceAngle + abs(measurements(t).angle) + 90;
+        %faceAngle gives angle relative to y, +90 makes it relative to X
+        %when mouse is at bottom, facing left, measurements(t).angle is the
+        %angle on the back of the whisker between the whisker and the
+        %horizontal plane
+        %If running amanda's code as is, whiskAngle is the angle from under
+        %the face edge, counterclockwise to the back of the whisker
+        relFaceAngle = faceAngle + 90; %this gives angle from nose up to x
+        %relFaceAngle is from the nose counterclockwise to horizontal
+        %whiskAngle =  faceAngle + abs(measurements(t).angle) + 90;
+        whiskAngle = abs(measurements(t).angle) %this way, whiskAngle should start small and protract to get big, but won't go above 360.
+        
+        verbose = 1; %1 for printing all warnings, 0 for hiding them
         
         %Check each traced object and determine if potential whisker or
         %not; returns '0' if not whisker and '1' if it is
-        isWhisker(j) = checkTrace_b(follicleX,follicleY,whiskerTipX,whiskerTipY,xThresh1,yThresh1,xThresh2,yThresh2,...
-            minLength,faceEdgeX,faceEdgeY,minFollicleDistance,faceAngle,whiskAngle);
+        isWhisker(j) = checkTrace(follicleX,follicleY,whiskerTipX,whiskerTipY,xThresh1,yThresh1,xThresh2,yThresh2,...
+            minLength,faceEdgeX,faceEdgeY,minFollicleDistance,relFaceAngle,whiskAngle, verbose);
         
         %         whiskers(t).x,whiskers(t).y,xThresh1,yThresh1,xThresh2,yThresh2,...
         %             minLength,faceEdgeX,faceEdgeY,minFollicleDistance,faceAngle,whiskers(t).whiskAngle);
@@ -132,7 +146,7 @@ for i = 1:nFrames
             whiskerAngles(j) = whiskAngle;
         end
         
-    end
+    end %end loop through whiskers in this frame
     
     %Save info for all objects in current frame
     temp = find(isnan(whiskerAngles));
@@ -142,7 +156,7 @@ for i = 1:nFrames
     whiskerCurvature(i) = mean(whiskerCurve);
     
     if isequal(plotFig,'y')
-        figure(1)
+        figure(h)
         %hold on
         %plot(i,whiskerPosition(i),'.-b')
         %axis([0 nFrames 0 1])
@@ -153,7 +167,11 @@ for i = 1:nFrames
         hold off
         %clf
     end
-end
+    
+    waitforbuttonpress
+    
+end %end loop through all frames
+
 whiskersAll = measurements(1:t);
 whiskersAll(noWhiskerInd) = [];
 

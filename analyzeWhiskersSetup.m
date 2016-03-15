@@ -1,7 +1,7 @@
 function analyzeWhiskersSetup(filename,vidobj)
 
-close all
-%vidfile = 'G05-7_150fps_medexpmedgain_partial_invert2.mp4';
+
+%vidfile = '160226-6.mp4';
 %disp('Loading video file...')
 %vidobj = VideoReader(vidfile); %Load the video file
 
