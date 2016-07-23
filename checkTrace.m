@@ -11,12 +11,13 @@ var = 1;
 
 %Checks angle of object relative to face, to rule out objects that are
 %oriented at the wrong angle (like lick spout)
-if whiskAngle + faceAngle > 360
+if whiskAngle + faceAngle > 135 %180 %360
+    var = 0;
     if verbose==1
     warning('A whisker might be too far protracted!')
     end
 end
-if whiskAngle < 30
+if whiskAngle - faceAngle < 20 %whiskAngle < 50
     var = 0;
     if verbose==1
     warning(['A whisker is at a suspiciously retracted angle! whiskAngle = ' num2str(whiskAngle)]')
@@ -49,12 +50,14 @@ end
 
 %Sets a threshold such that the 'follicle' of the traced object has to be x
 %distance from the face edge
-if minFollicleDistance > 50 %20
+if minFollicleDistance > 40 %20
     if verbose==1
     warning(['A whisker is too far from the face! min follicle distance = ' num2str(minFollicleDistance)])
     end
-    if wlength > minFollicleDistance
+    if ((wlength > minFollicleDistance) && minFollicleDistance >60) || (wlength > minFollicleDistance*2)
+        if verbose ==1
         warning(['Oh good, the whisker is long enough to count. length = ' num2str(wlength)])
+        end
     else
         var = 0;
     end
@@ -73,7 +76,9 @@ b = y1 - (slope*x1);
 %different for a vertical face
 if fy > (slope*fx + b)
     var = 0;
+    if verbose ==1
     warning('Follicle is below the line of the cheek!')
+    end
 end
 
 if min(abs(fy - faceEdgeY)) > 40

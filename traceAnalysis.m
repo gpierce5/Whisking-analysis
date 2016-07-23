@@ -22,7 +22,7 @@ for i = 1:size(measurements,1)
     frame(i) = measurements(i).fid;
 end
 
-minLength = 70;
+minLength = 50;
 %whiskerFrames(1) = struct('cdata',zeros(vidHeight,vidWidth,'uint8'),...
 %    'colormap',[]);
 
@@ -75,7 +75,7 @@ for i = 1:nFrames
     %Going through each object in this frame for analysis
     for j = 1:length(indList)
         
-        %waitforbuttonpress
+        
         
         t = indList(j);
         
@@ -93,10 +93,10 @@ for i = 1:nFrames
         %horizontal plane
         %If running amanda's code as is, whiskAngle is the angle from under
         %the face edge, counterclockwise to the back of the whisker
-        relFaceAngle = faceAngle + 90; %this gives angle from nose up to x
+        relFaceAngle = 90-faceAngle; %this gives angle from nose up to x
         %relFaceAngle is from the nose counterclockwise to horizontal
         %whiskAngle =  faceAngle + abs(measurements(t).angle) + 90;
-        whiskAngle = abs(measurements(t).angle) %this way, whiskAngle should start small and protract to get big, but won't go above 360.
+        whiskAngle = abs(measurements(t).angle); %this way, whiskAngle should start small and protract to get big, but won't go above 360.
         
         verbose = 1; %1 for printing all warnings, 0 for hiding them
         
@@ -109,6 +109,14 @@ for i = 1:nFrames
         %             minLength,faceEdgeX,faceEdgeY,minFollicleDistance,faceAngle,whiskers(t).whiskAngle);
         %
         %noWhiskerInd(z) = [];tr
+        
+        %for debugging
+        if i>9  %if i= problem frame +1, then will go whisker by whisker
+            plot(follicleX,follicleY,'cp')
+            p=3;
+        end
+        
+        
         if isequal(isWhisker(j),0)
             if isequal(plotFig,'y')
                 plot([follicleX whiskerTipX],[follicleY whiskerTipY],'-r','MarkerSize',20) %Rejected whisker objects
@@ -146,6 +154,12 @@ for i = 1:nFrames
             whiskerAngles(j) = whiskAngle;
         end
         
+        
+        %this is for debugging indivudual whiskers
+        
+        
+        
+        
     end %end loop through whiskers in this frame
     
     %Save info for all objects in current frame
@@ -166,9 +180,10 @@ for i = 1:nFrames
         %input('continue?')
         hold off
         %clf
+        waitforbuttonpress %computer won't plot fast enough unless you wait for it
     end
     
-    waitforbuttonpress
+    
     
 end %end loop through all frames
 
