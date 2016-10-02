@@ -1,11 +1,14 @@
-function traceAnalysis(filename,plotFig) %Use filename + .mat extension
+function traceAnalysis(nfile, vidfile,plotFig) %Use filename + .mat extension
+
+filename = [nfile '.mat'];
 
 %Loading all the necessary files
-vidfile = sprintf('%s',filename(1:end-4),'.mp4');
+% vidfile = sprintf('%s',filename(1:end-4),'.mp4');
 disp('Loading video file...')
 vidobj = VideoReader(vidfile); %Load the video file
 
-measurefile = sprintf('%s',filename(1:end-4),'.measurements');
+[pathstr, vidname, ext] = fileparts(vidfile);
+measurefile = [vidname ext];
 disp('Loading measurements file...')
 measurements = LoadMeasurements(measurefile);
 
