@@ -4,6 +4,7 @@ function analyzeWhiskersSetup(filename,vidobj)
 %vidfile = '160226-6.mp4';
 %disp('Loading video file...')
 %vidobj = VideoReader(vidfile); %Load the video file
+H = figure;
 
 %Get video information
 nFrames = vidobj.NumberOfFrames;
@@ -25,7 +26,7 @@ whiskMov(1).cdata = read(vidobj,1);
 %Manually set X and Y threshold for whisker quadrant
 checkThresh = 0;
 while isequal(checkThresh, 0)
-    figure(1)
+    figure(H)
     image(whiskMov(1).cdata)
     hold on
     disp('Upper right XY boundary for whisker quadrant: ');
@@ -47,7 +48,7 @@ end
 disp('Now set the start and end positions for the side of the face you are analyzing.')
 checkThresh = 0;
 while isequal(checkThresh, 0)
-    figure(1)
+    figure(H)
     disp('Enter [x y] coordinates for front (near the nose) face edge (e.g. [118,145]): ');
     faceEdgeStart = ginput(1);
     disp('Enter [x y] coordinates for back face edge (e.g. [147,183]): ');
@@ -64,10 +65,20 @@ disp('Enter [x y] coordinates for the location of the IR LED light spot: ');
 IRledLocation = ginput(1);
 IRledLocation = round(IRledLocation);
 
+faceside= input('What side is the cheek? (left, right, bottom, top)');
+
 disp('Saving .mat file...')
+disp('Saving .mat file...')
+if exist(filename,'file')
 save(filename,'nFrames','vidLength','vidFrameRate','vidHeight',...
     'vidWidth','df','xThresh1','yThresh1','xThresh2','yThresh2','faceEdgeX','faceEdgeY','faceAngle',...
-    'IRledLocation')
+    'IRledLocation','faceside','-append')
+else
+    save(filename,'nFrames','vidLength','vidFrameRate','vidHeight',...
+    'vidWidth','df','xThresh1','yThresh1','xThresh2','yThresh2','faceEdgeX','faceEdgeY','faceAngle',...
+    'IRledLocation','faceside')
+end
+
 end
 
 function [fX,fY,angle] = calcFaceEdge(fstart,fend)

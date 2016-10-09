@@ -1,28 +1,28 @@
-function var = checkTrace(fx,fy,tx,ty,xThresh1,yThresh1,xThresh2,yThresh2,minLength,...
-    faceEdgeX,faceEdgeY,minFollicleDistance,faceAngle,whiskAngle, verbose)
-%checkTrace 
-%   formerly checkTrace_b
+function var = checkTrace(fx,fy,tx,ty,xThresh1,yThresh1,xThresh2,yThresh2,...
+    faceEdgeX,faceEdgeY,minFollicleDistance,faceAngle,whiskAngle, faceside)
+% adapted from Amanda's checkTrace_c
+%INPUT:
+% fx & fy: x and y positions for follicle point of traced object
+% tx & ty: x and y positions for tip point of traced object
+% xThresh1,yThresh1,xThresh2,yThresh2: ROI boundaries
+% faceEdgeX & faceEdgeY: line for the edge of the face
+% minFollicleDistance: distance from the follicle point on the object to closest point on the face
+% faceAngle: angle of the mouse's face
+% whiskAngle: angle of the traced object
 
-
-
-wlength = [];
+%OUTPUT:
+%var = set to 1 (is whisker object) or 0 (not whisker object). Default is
+%set to 1, but value is changed to 0 if any of the following criteria are
+%not true
 
 var = 1;
 
 %Checks angle of object relative to face, to rule out objects that are
 %oriented at the wrong angle (like lick spout)
-if whiskAngle + faceAngle > 135 %180 %360
-    var = 0;
-    if verbose==1
-    warning('A whisker might be too far protracted!')
-    end
-end
-if whiskAngle - faceAngle < 20 %whiskAngle < 50
-    var = 0;
-    if verbose==1
-    warning(['A whisker is at a suspiciously retracted angle! whiskAngle = ' num2str(whiskAngle)]')
-    end
-end
+% if whiskAngle < 30
+%     var = 0;
+% end
+
 % %Checks that at least 2/3 of the traced object is within the chosen
 % %quadrant for whiskers.
 % if (sum(xp < xThresh2) + sum(xp > xThresh1)) >= (length(xp)/2)
@@ -31,76 +31,65 @@ end
 %     var = 0;
 % end
 
+%Determine which way the face is oriented
+
+a = 'stop';
 %Checks if follicle point is within ROI
-if (fx < xThresh2) || (fx > xThresh1) || (fy < yThresh1) || (fy > yThresh2) %these are different than Amanda's
-    var = 0;
-    if verbose==1
-    warning('A whisker exited the whisker threshold!')
+if isequal(faceside,'right')
+    if (fx > xThresh1) || (fy < yThresh1)
+        var = 0;
     end
+elseif isequal(faceside,'left')
+    if (fx < xThresh2) || (fy < yThresh1) || (fx > xThresh1) || (fy > yThresh2)
+        var = 0;
+    end
+elseif isequal(faceside,'top')
+    if (fx < xThresh2) || (fy < yThresh1) || (fx > xThresh1) || (fy > yThresh2)
+        var = 0;
+    end
+else
+    warning('no parameters set for current face side')
 end
 
-wlength = sqrt((tx - fx)^2 + (ty - fy)^2);
 %Sets a minimum length that object has to exceed to be considered a whisker
-if wlength <= minLength
+wlength = sqrt((tx - fx)^2 + (ty - fy)^2); %Length of current traced object
+minLength = 42;
+
+if abs(wlength) <= minLength
     var = 0;
-    if verbose==1
-    warning(['A whisker was too short! length = ' num2str(wlength)])
-    end
 end
 
 %Sets a threshold such that the 'follicle' of the traced object has to be x
 %distance from the face edge
-if minFollicleDistance > 40 %20
-    if verbose==1
-    warning(['A whisker is too far from the face! min follicle distance = ' num2str(minFollicleDistance)])
-    end
-    if ((wlength > minFollicleDistance) && minFollicleDistance >60) || (wlength > minFollicleDistance*2)
-        if verbose ==1
-        warning(['Oh good, the whisker is long enough to count. length = ' num2str(wlength)])
-        end
-    else
-        var = 0;
-    end
-    
-end
-
-%Thow out objects where the follicle is below the line of the face
-%define parts of the line equation
-x1=faceEdgeX(1);
-y1=faceEdgeY(1);
-x2 = faceEdgeX(end);
-y2 = faceEdgeY(end);
-slope = (y2-y1)/(x2-x1);
-b = y1 - (slope*x1);
-%if the point is below the line of the face, discard => this would be
-%different for a vertical face
-if fy > (slope*fx + b)
+follicleDistThresh = 100;
+if minFollicleDistance > follicleDistThresh
     var = 0;
-    if verbose ==1
-    warning('Follicle is below the line of the cheek!')
-    end
 end
 
+%Set a distance threshold just in the 'y' dimension. this is useful for
+%ruling out little hairs on the body that are close to the face in the
+%x-direction but far from the face in the y-direction
 if min(abs(fy - faceEdgeY)) > 40
+    var = 0;
+end
+
+%Follicle point has to be to the left of the face edge
+dist = [];
+minDist = [];
+dist = [];
+for j = 1:size(faceEdgeX,2)
+    dist(j) = sqrt((faceEdgeX(j) - fx)^2 + (faceEdgeY(j) - fy)^2);
+end
+
+[a,b]=min(dist);
+if fx > faceEdgeX(b) && fy > faceEdgeY(b)
     %var = 0;
 end
-%Throws out objects that are exactly horizontal - most likely artificial
-%background lines from having gain turned up high
-% yslope = mean(diff(yp));
-% 
-% if abs(yslope) < 0.1
-%     var = 0;
-% end
 
-% if yp(end) > (faceEdgeY(end) + 10)
-%     var = 0;
-% end
+if whiskAngle > 310
+    var = 0;
+    %warning('did you mean to cut out big angles?')
+end
 
-%Plot the traced objects for the current frame
-% if isequal(var,0)
-%     plot([fx tx],[fy ty],'-r','MarkerSize',20) %Rejected whisker objects
-% else
-%     plot([fx tx],[fy ty],'-g','MarkerSize',20) %Rejected whisker objects
-%     plot([fx tx],[fy ty],'.b','MarkerSize',20) %Rejected whisker objects
-% end
+
 end

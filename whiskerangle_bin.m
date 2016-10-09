@@ -3,13 +3,17 @@
 %filename = fname2;
 load(filename)
 
-binSize = 4; %number of frames per bin
+%NOTE: YOU SAVED ANGLE VARIABLE AS WHISKERPOSITION, really it is the angle
+%calculated by Amanda's program, it's possible it gets smaller as they
+%protract if the mouse is facing down (hers face upwards)
+
+binSize = 20; %number of frames per bin
 i = 1;
 a = 1;
 
 while i <= length(whiskerPosition_median) - binSize
-    whiskerPosition_binned(a) = nanmean(whiskerPosition(i:i+binSize));
-    whiskerPosition_median_binned(a) = nanmean(whiskerPosition_median(i:i+binSize));
+    whiskerPosition_binned(a) = nanmean(whiskerPosition(i:i+binSize-1)); %Amanda has no -1... is that better?
+    whiskerPosition_median_binned(a) = nanmean(whiskerPosition_median(i:i+binSize-1));
     i = i + binSize;
     a = a+1;
 
@@ -24,6 +28,7 @@ whiskerPosition_varSR = sqrt(whiskerPosition_var);
 
 
 save(filename,'whiskerPosition_median_binned','whiskerPosition_var','whiskerPosition_varSR','-append')
+%save(filename,'whiskerPosition_median_binned','whiskerPosition_median_orig','whiskerPosition_median','whiskerPosition_var','whiskerPosition_varSR','-append')
 
 figure()
 hold on
