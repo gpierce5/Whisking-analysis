@@ -53,7 +53,7 @@ end
 
 %Sets a minimum length that object has to exceed to be considered a whisker
 wlength = sqrt((tx - fx)^2 + (ty - fy)^2); %Length of current traced object
-minLength = 42;
+minLength = 48;
 
 if abs(wlength) <= minLength
     var = 0;
@@ -86,7 +86,7 @@ if fx > faceEdgeX(b) && fy > faceEdgeY(b)
     %var = 0;
 end
 
-if whiskAngle > 310
+if whiskAngle > 300
     var = 0;
     %warning('did you mean to cut out big angles?')
 end

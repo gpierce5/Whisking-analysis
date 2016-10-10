@@ -19,7 +19,12 @@ b=1;
 %IRLedStartFrames = getIRStartTimes(IRledSignal(1,:),samplingRate);
 maxAlignmentError = 100;
 check3 = 'y';
-
+A = figure()
+plot(IRledSignal(1,:),'-b')
+axis tight
+drawnow
+IRthresh = input('Set IR LED threshold: ');
+close(A)
 %
 while maxAlignmentError > 35 && isequal(check3,'y')
     %     [IRLedStartFrames,LedSig] = getIRStartFrames(IRledSignal(1,:),df);
@@ -49,7 +54,7 @@ while maxAlignmentError > 35 && isequal(check3,'y')
     disp(['Found ',num2str(length(IRLedStartFrames)), ' video start times'])
     disp(['Found ',num2str(length(trialStartTimes)), ' ntrode start times'])
     
-    IRLedStartTimes = IRLedStartFrames*df;
+%     IRLedStartTimes = IRLedStartFrames*df;
     
     check = 0;
     check2 = 0;

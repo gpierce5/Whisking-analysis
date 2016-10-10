@@ -1,6 +1,9 @@
+
+function whiskerangle_bin(filename)
 %A Kinnischtzke
 %filename = '150831_file-0.mat';
 %filename = fname2;
+
 load(filename)
 
 %NOTE: YOU SAVED ANGLE VARIABLE AS WHISKERPOSITION, really it is the angle
@@ -87,4 +90,6 @@ set(h,'FaceColor','g','EdgeColor','w')
 axis tight
 title('histogram of sqrt(variance) of whisker angle')
 
+
+end
 
