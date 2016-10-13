@@ -119,35 +119,32 @@ a=1;
             spikeEnd = length(trialStartTimes) - lastStimNtrode;
             whiskEnd = length(IRLedStartFrames) - lastStimWhisk;
         end
-        trialStartTimes_adj = trialStartTimes(spikeStart:spikeEnd) - trialStartTimes(spikeStart);
-        IRLedStartFrames_adj = IRLedStartFrames(whiskStart:whiskEnd) - IRLedStartFrames(whiskStart);
-        IRLedStartTimes_adj = IRLedStartTimes(whiskStart:whiskEnd) - IRLedStartTimes(whiskStart);
         
         
         %LedSig_adj = LedSig(IRLedStartFrames(whiskStart):IRLedStartFrames(whiskEnd));
         
-        if length(trialStartTimes_adj) ~= length(IRLedStartTimes_adj)
-            warning('Start times not aligned correctly')
-            check2 = 0;
-            disp('checking uniqueness')
-            FR_ms = unique(IRLedStartTimes_adj);
-        FR = unique(IRLedStartFrames_adj);
-        if length(FR)~=length(IRLedStartFrames_adj)
-            disp('Uh oh! There may be a duplicate frame.')
-        end
-        TS = unique(trialStartTimes_adj);
-        if length(TS)~=length(trialStartTimes_adj)
-            disp('Uh oh! There may be a duplicate ntrode trial start.')
-            check_uniques = input('Delete duplicate trial start? (yes = 1; no = 0) ');
-            if check_uniques==1
-                trialStartTimes_adj =TS;
-                check2 = 1;
-            end
-        end
-            
-        else
-            check2 = 1;
-        end
+%         if length(trialStartTimes_adj) ~= length(IRLedStartTimes_adj)
+%             warning('Start times not aligned correctly')
+%             check2 = 0;
+%             disp('checking uniqueness')
+%             FR_ms = unique(IRLedStartTimes_adj);
+%         FR = unique(IRLedStartFrames_adj);
+%         if length(FR)~=length(IRLedStartFrames_adj)
+%             disp('Uh oh! There may be a duplicate frame.')
+%         end
+%         TS = unique(trialStartTimes_adj);
+%         if length(TS)~=length(trialStartTimes_adj)
+%             disp('Uh oh! There may be a duplicate ntrode trial start.')
+%             check_uniques = input('Delete duplicate trial start? (yes = 1; no = 0) ');
+%             if check_uniques==1
+%                 trialStartTimes_adj =TS;
+%                 check2 = 1;
+%             end
+%         end
+%             
+%         else
+%             check2 = 1;
+%         end
         
         subplot(2,1,1)
         plot(trialStartTimes_adj,1,'.g')
@@ -208,22 +205,22 @@ a=1;
     subplot(4,1,3)
     hold on
     plot(trialStartTimes_adj,1,'.g')
-    plot(IRLedStartTimes_adj2,2,'.r')
+    plot(IRLedStartTimes_adj2',2,'.r')
     axis([0 maxTime -3 6])
-    maxAlignmentError = max(abs((trialStartTimes_adj - IRLedStartTimes_adj2)));
+    maxAlignmentError = max(abs((trialStartTimes_adj - IRLedStartTimes_adj2')));
     text(1e4,5,['Max offset error = ',num2str(maxAlignmentError),' ms'])
     title('Aligned & time corrected trial start times')
     
     subplot(4,1,4)
     hold on
-    plot(trialStartTimes_adj - IRLedStartTimes_adj2,'.-k')
-    
+    plot(trialStartTimes_adj - IRLedStartTimes_adj2','.-k')
+    title('look here for dropped frames')
     drawnow limitrate
     
     check3 = input('continue? y or n');
     
     if isequal(check3,'y') %I think this is if you dropped frames???
-        d = trialStartTimes_adj - IRLedStartTimes_adj2;
+        d = trialStartTimes_adj - IRLedStartTimes_adj2';
         [y,x] = max(diff(d));
         
         timeOff = round(y);
@@ -233,7 +230,7 @@ a=1;
             x = x + (whiskStart-spikeStart);
         end
         IRledSignal = insertFrames(IRledSignal,IRLedStartFrames,nFramesAdd,x);
-        
+        %adds the new frames 100 frames in from trial start
         framesChanged(b,1) = nFramesAdd;
         framesChanged(b,2) = x;
         b = b+1;
