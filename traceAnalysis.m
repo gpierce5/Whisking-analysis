@@ -187,15 +187,18 @@ for i = 1:nFrames
     
     
     if isequal(plotFig,'y')
+        title(['Frame: ' num2str(i) '  Med Ang: ' num2str(whiskerPosition_median(i))])
         drawnow limitrate
-        %         title(['Frame: ' num2str(i) '  Med Ang: ' num2str(whiskerPosition_median(i))])
         figure(h)
         hold off
+%         pause(0.2)
     end
     
     %     if ~isempty(input('continue? '))
     %         keyboard;
     %     end
+
+    
 end
 
 %Saving only whiskers entries that were decided to be whiskers
