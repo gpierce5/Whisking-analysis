@@ -53,7 +53,7 @@ end
 
 %Sets a minimum length that object has to exceed to be considered a whisker
 wlength = sqrt((tx - fx)^2 + (ty - fy)^2); %Length of current traced object
-minLength = 30;
+minLength = 40;
 
 if abs(wlength) <= minLength
     var = 0;
@@ -61,7 +61,7 @@ end
 
 %Sets a threshold such that the 'follicle' of the traced object has to be x
 %distance from the face edge
-follicleDistThresh = 35;
+follicleDistThresh = 100;
 if minFollicleDistance > follicleDistThresh
     var = 0;
 end
@@ -69,12 +69,12 @@ end
 %Set a distance threshold just in the 'y' dimension. this is useful for
 %ruling out little hairs on the body that are close to the face in the
 %x-direction but far from the face in the y-direction
-if faceside == 'top'
+if isequal(faceside,'top')
     if min(abs(fx - faceEdgeX)) > 20
     var = 0;
     end
 else
-    if min(abs(fy - faceEdgeY)) > 40
+    if min(abs(fy - faceEdgeY)) > 50
     var = 0;
     end
 end
@@ -92,7 +92,7 @@ if fx > faceEdgeX(b) && fy > faceEdgeY(b)
     %var = 0;
 end
 
-if whiskAngle > 335
+if whiskAngle > 390
     var = 0;
     %warning('did you mean to cut out big angles?')
 end
