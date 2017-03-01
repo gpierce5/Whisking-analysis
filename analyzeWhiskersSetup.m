@@ -61,9 +61,10 @@ while isequal(checkThresh, 0)
     checkThresh = input('Does this look correct (0 = no, 1 = yes)? ');
 end
 
-disp('Enter [x y] coordinates for the location of the IR LED light spot: ');
-IRledLocation = ginput(1);
-IRledLocation = round(IRledLocation);
+%moved this to when you are checking for led pixel values
+% disp('Enter [x y] coordinates for the location of the IR LED light spot: ');
+% IRledLocation = ginput(1);
+% IRledLocation = round(IRledLocation);
 
 faceside= input('What side is the cheek? (left, right, bottom, top)');
 
@@ -72,11 +73,11 @@ disp('Saving .mat file...')
 if exist(filename,'file')
 save(filename,'nFrames','vidLength','vidFrameRate','vidHeight',...
     'vidWidth','df','xThresh1','yThresh1','xThresh2','yThresh2','faceEdgeX','faceEdgeY','faceAngle',...
-    'IRledLocation','faceside','-append')
+    'faceside','-append')
 else
     save(filename,'nFrames','vidLength','vidFrameRate','vidHeight',...
     'vidWidth','df','xThresh1','yThresh1','xThresh2','yThresh2','faceEdgeX','faceEdgeY','faceAngle',...
-    'IRledLocation','faceside')
+    'faceside')
 end
 
 end

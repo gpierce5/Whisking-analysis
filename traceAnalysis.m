@@ -12,10 +12,12 @@ if ~isequal(fname(end-3:end),'.mat')
     filename = [fname '.mat'];
 end
 
+croppedVideoOk = compareVidFrames(filename(1:end-4))
+
 %Create a mat file if doesn't already exist and run the 'setup' analysis
 if ~exist(filename,'file')
     %Loading video file
-    vidfile = sprintf('%s',filename(1:end-4),'.mp4');
+    vidfile = sprintf('%s',filename(1:end-4),'v2.mp4');
     disp('Loading video file...')
     vidobj = VideoReader(vidfile);
     analyzeWhiskersSetup(filename,vidobj);
@@ -24,9 +26,9 @@ end
 load(filename)
 
 if isequal(plotFig,'y')
-    if ~exist('vidobj','var')
+    if ~exist('vidobj','var') 
         %Loading video file
-        vidfile = sprintf('%s',filename(1:end-4),'.mp4');
+        vidfile = sprintf('%s',filename(1:end-4),'v2.mp4');
         disp('Loading video file...')
         vidobj = VideoReader(vidfile); %Load the video file
     end
@@ -38,7 +40,7 @@ end
 %
 
 %Load measurements
-if exist([fname '-measurements.mat'],'file')
+if exist([fname '-measurements.mat'],'file') %fix this it = 2 sometimes
     measurefile = [fname '-measurements.mat'];
     load(measurefile)
     disp(['loaded ' measurefile])

@@ -14,18 +14,6 @@ signal = zeros(1,n);
 
 whiskMov = zeros(vidobj.Height,vidobj.Width,3,'uint8');
 
-%plot a frame
-wmov = struct('cdata',zeros(vidobj.Height,vidobj.Width,3,'uint8'),...
-'colormap',[]);
-wmov.cdata = read(vidobj,1000)
-figure
-image(wmov.cdata)
-
-disp('Enter [x y] coordinates for the location of the IR LED light spot: ');
-IRledLocation = ginput(1);
-IRledLocation = round(IRledLocation);
-position = IRledLocation;
-
 percDone = 0;
 disp('Getting IR LED pixel value...')
 disp(sprintf('%s',num2str(percDone),'% done...'))
@@ -64,9 +52,9 @@ else
 end
 
 if exist(f,'file')
-    save(f,'IRledSignal','IRledLocation','-append')
+    save(f,'IRledSignal','-append')
 else
-    save(f,'IRledSignal','IRledLocation')
+    save(f,'IRledSignal')
 end
 
 end

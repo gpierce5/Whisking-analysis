@@ -76,9 +76,7 @@ LEDvect(IRLedStartFrames) = 1;
 % xWhisk_current = dw:dw:length(trialStartVect); %Current time step vector (in steps of dw)
 % xWhisk_new = 1:1:length(trialStartVect); %New time step vector (in steps of 1 ms)
 
-%whisk x vector for video that only includes whisking, no contact or ntrode
-%trialstarts
-xWhisk = df:df:length(whiskerPosition_median)*df; %should be in ms?
+
 
 
 % whiskVectData = interp1(xWhisk_current,whiskerPosition_varSR,xWhisk_new); %this is the step that does the interpolation
@@ -107,14 +105,20 @@ indFrames_new = round((nFrames/nFrames_new).*(1:nFrames_new));
 writerObj = VideoWriter('whiskerVideo.avi','Motion JPEG AVI'); 
 %writerObj = VideoWriter('whiskerVideo.mp4','MPEG-4');
 
-speedSlowed = 5;
+speedSlowed = 4;
 writerObj.FrameRate = vidFR/speedSlowed; %controls how fast the video is played back
 open(writerObj);
 
 %frame number that's the middle of the display
 cFrame = vidFR*(timeDisplay/2)/1000;
-startframe = 96800;
-endframe = 98500;
+startframe = 96900;
+endframe = 98400;
+
+%whisk x vector for video that only includes whisking, no contact or ntrode
+%trialstarts
+x1 = [df:df:length(whiskerPosition_median)*df]; %should be in ms?
+xWhisk= (x1-x1(startframe))/1000; %in seconds
+
 b= find(whiskersAll.fID==startframe,1,'first');
 stp = find(whiskersAll.fID==endframe+1,1,'first');
 for i = startframe:endframe %from middle frame whatever to whatever else
@@ -132,7 +136,7 @@ whiskMov.cdata = read(vidobj,cTime);
     hold off
     
     %Plot the video image for current frame
-    subplot(7,3,[1:12])
+    subplot(7,3,[1:9])
     image(whiskMov.cdata)
     axis square
     set(gca,'Visible','off')
@@ -159,30 +163,39 @@ whiskMov.cdata = read(vidobj,cTime);
     hold off
     
     %Plotting the median whisker angle per frame
-    subplot(7,3,13:18)
+    subplot(7,3,10:12)
+    plot(xWhisk(sTime:eTime),whiskerPosition_median(sTime:eTime),'-m','LineWidth',2)
+    hold on
+    line([xWhisk(cTime) xWhisk(cTime)],[min(whiskerPosition_varSR) max(whiskerPosition_median)],'Color','k','LineWidth',1,'LineStyle','--')
+    axis([xWhisk(sTime) xWhisk(eTime) min(whiskerPosition_varSR) max(whiskerPosition_median)]);
+    ylim([125 250])
+    % set(gca,'XTickLabel',{' '})
+    ylabel('median angle')
+    hold off
     %Adding the LED sync signal to this plot
 %     plot(xvect2(sTime:eTime),(max(whiskVectData)*LEDvectData(sTime:eTime)) + min(whiskVectData),'-k','LineWidth',1)
 %     hold on
 %     plot(xvect2(sTime:eTime),whiskVectData(sTime:eTime),'-g','LineWidth',2)
 %     line([xvect2(cTime) xvect2(cTime)],[min(whiskVectData) max(whiskVectData)],'Color','k','LineWidth',2)
 %     axis([xvect2(sTime) xvect2(eTime) min(whiskVectData) max(whiskVectData)]);
-    
-    plot((sTime:eTime),whiskerPosition_varSR(sTime:eTime),'-b','LineWidth',2)
+    subplot(7,3,13:18)
+    plot(xWhisk(sTime:eTime),whiskerPosition_varSR(sTime:eTime),'-b','LineWidth',2)
     hold on
-    line([(cTime) (cTime)],[min(whiskerPosition_varSR) max(whiskerPosition_varSR)],'Color','k','LineWidth',1,'LineStyle','--')
-    axis([(sTime) (eTime) min(whiskerPosition_varSR) max(whiskerPosition_varSR)]);
-     set(gca,'XTickLabel',{' '})
-    title('std of whisker angle')
+    line([xWhisk(cTime) xWhisk(cTime)],[min(whiskerPosition_varSR) max(whiskerPosition_varSR)],'Color','k','LineWidth',1,'LineStyle','--')
+    axis([xWhisk(sTime) xWhisk(eTime) min(whiskerPosition_varSR) max(whiskerPosition_varSR)]);
+     %set(gca,'XTickLabel',{' '})
+    ylabel('std dev of median')
     
     hold off
     %plotting the LED start times
     subplot(7,3,19:21)
-    plot((sTime:eTime),LEDvect(sTime:eTime),'Color','k','LineWidth',2)
+    plot(xWhisk(sTime:eTime),LEDvect(sTime:eTime),'Color','k','LineWidth',2)
     hold on
-    line([(cTime) (cTime)],[0 1.5],'Color','k','LineWidth',1,'LineStyle','--')
-    axis([(sTime) (eTime) 0 1.5]);
-    set(gca,'XTickLabel',{' '})
-    title('trial starts')
+    line([xWhisk(cTime) xWhisk(cTime)],[0 1.5],'Color','k','LineWidth',1,'LineStyle','--')
+    axis([xWhisk(sTime) xWhisk(eTime) 0 1.5]);
+    %set(gca,'XTickLabel',{' '})
+    ylabel('trial starts')
+    xlabel('time (sec)')
     hold off
 %     
 %     %Plotting the contact data & times  

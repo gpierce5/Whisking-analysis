@@ -53,7 +53,7 @@ end
 
 %Sets a minimum length that object has to exceed to be considered a whisker
 wlength = sqrt((tx - fx)^2 + (ty - fy)^2); %Length of current traced object
-minLength = 40;
+minLength = 50;
 
 if abs(wlength) <= minLength
     var = 0;
@@ -61,7 +61,7 @@ end
 
 %Sets a threshold such that the 'follicle' of the traced object has to be x
 %distance from the face edge
-follicleDistThresh = 100;
+follicleDistThresh = 70;
 if minFollicleDistance > follicleDistThresh
     var = 0;
 end
